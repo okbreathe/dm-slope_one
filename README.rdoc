@@ -1,6 +1,17 @@
 = dm-slope_one
 
-Implementation of the [Slope One](http://en.wikipedia.org/wiki/Slope_One) recommendation algorithm for DataMapper
+Implementation of the {Slope One}[http://en.wikipedia.org/wiki/Slope_One] recommendation algorithm for DataMapper
+
+=== Note
+
+* Requires ruby 1.9.x
+* Requires a SQL based backend. It has only been tested on Postgres, but may work on other RDBMS.
+
+=== Reading
+
+  http://cr3bits.wordpress.com/2010/11/13/incremental-collaborative-filtering-in-sql/
+  http://lemire.me/fr/documents/publications/lemiremaclachlan_sdm05.pdf
+  http://blog.charliezhu.com/2008/07/21/implementing-slope-one-in-t-sql/
 
 == Contributing to dm-slope_one
 
@@ -15,4 +26,3 @@ Implementation of the [Slope One](http://en.wikipedia.org/wiki/Slope_One) recomm
 == Copyright
 
 Copyright (c) 2011 Asher Van Brunt. See LICENSE.txt for further details.
-

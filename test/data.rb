@@ -15,9 +15,11 @@ class Article
   property :id,         Serial 
   property :name,       String
 
-  is :filterable, :by => "Rater", :on => "Vote"
+  is :slope_one, :rater_model => "Rater", :rating_model => "Vote", :rating_property => :preference
 
 end
-
-DataMapper.setup(:default, 'sqlite3::memory:')
+db = 'dm_slope_one'
+# DataMapper::Logger.new($stdout, :debug)
+DataMapper.setup(:default, "postgres://asher@localhost/#{db}")
+# DataMapper.setup(:default, 'sqlite3::memory:')
 DataMapper.auto_migrate! if defined?(DataMapper)
