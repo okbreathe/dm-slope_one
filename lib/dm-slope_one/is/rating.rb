@@ -4,51 +4,60 @@ module DataMapper
       module Rating
 
         def self.extended(base)
-          o = base.slope_one_options
           base.class_eval do
 
-            unless o[:offline]
+            unless slope_one_options[:offline]
               after  :create,  :create_diffs
               before :update,  :revert_diffs
               after  :update,  :update_diffs
               before :destroy, :remove_diffs
             end
 
-            # Generates differentials for the entire table 
+            # Generate differentials for the entire table 
             # NOTE - All existing differentials will be destroyed.
-            define_singleton_method :generate_diffs! do
+            def self.generate_diffs!
+              o = slope_one_options
               DataMapper::Inflector.constantize(o[:diff_model]).all.destroy!
               q = %Q{
-                INSERT INTO #{o[:diff_table]} ( source_id , target_id , sum , count ) 
-                     SELECT r2.#{o[:resource_key]}, r1.#{o[:resource_key]}, SUM(r2.#{o[:rating_property]} - r1.#{o[:rating_property]} ), COUNT(1)
-                       FROM #{o[:rating_table]} r1, #{o[:rating_table]} r2
-                      WHERE r1.#{o[:rater_key]} = r2.#{o[:rater_key]}
-                        AND r1.#{o[:resource_key]} < r2.#{o[:resource_key]}
-                   GROUP BY r1.#{o[:resource_key]}, r2.#{o[:resource_key]}
-                     HAVING COUNT(1) >= ?
+                INSERT INTO #{o[:diff_table]} ( source_id , target_id , sum , count )
+                     SELECT r2.#{o[:resource_key]}
+                          , r1.#{o[:resource_key]}
+                          , SUM(r2.#{o[:rating_property]} - r1.#{o[:rating_property]})
+                          , COUNT(1)
+                       FROM #{o[:rating_table]} r1
+                 INNER JOIN #{o[:rating_table]} r2 ON r1.#{o[:rater_key]} = r2.#{o[:rater_key]}
+                      WHERE r1.#{o[:resource_key]} < r2.#{o[:resource_key]}
+                   GROUP BY r1.#{o[:resource_key]}
+                          , r2.#{o[:resource_key]}
+                     HAVING COUNT(1) >= 1
               }
-              repository.adapter.execute(q,1)
+              repository.adapter.execute(q)
             end
 
-            define_method :create_diffs do
-              update_diff_table("SET count = count + 1, sum = sum + r2.#{o[:rating_property]} - r1.#{o[:rating_property]}") 
+            def create_diffs
+              r = self.class.slope_one_options[:rating_property]
+              update_diff_table("SET count = count + 1, sum = sum + r2.#{r} - r1.#{r}") 
             end
 
-            define_method :revert_diffs do
-              update_diff_table("SET sum = sum - (r2.#{o[:rating_property]} - r1.#{o[:rating_property]})") 
+            def revert_diffs
+              r = self.class.slope_one_options[:rating_property]
+              update_diff_table("SET sum = sum - (r2.#{r} - r1.#{r})") 
             end
 
-            define_method :update_diffs do
-              update_diff_table("SET sum = sum + r2.#{o[:rating_property]} - r1.#{o[:rating_property]}") 
+            def update_diffs
+              r = self.class.slope_one_options[:rating_property]
+              update_diff_table("SET sum = sum + r2.#{r} - r1.#{r}") 
             end
 
-            define_method :remove_diffs do
-              update_diff_table("SET count = count - 1, sum = sum - (r2.#{o[:rating_property]} - r1.#{o[:rating_property]})" )
+            def remove_diffs
+              r = self.class.slope_one_options[:rating_property]
+              update_diff_table("SET count = count - 1, sum = sum - (r2.#{r} - r1.#{r})" )
             end
 
             protected
 
-            define_method :update_diff_table do |q|
+            def update_diff_table(q)
+              o = self.class.slope_one_options
               query = %Q{
                 UPDATE #{o[:diff_table]}
                 #{q}

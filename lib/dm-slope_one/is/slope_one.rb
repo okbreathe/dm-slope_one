@@ -76,7 +76,7 @@ module DataMapper
           [Float, :precision => o[:rating_precision], :scale => o[:rating_scale], :default => 0.0] : 
             [Integer, :default => 0]
 
-        # Setup the diff model
+        # Create the diff model
 
         diff_model = ::Object.const_set(diff_model, Class.new(::Object) )
         diff_model.class_eval do
@@ -87,7 +87,8 @@ module DataMapper
           belongs_to :target, resource_model.to_s, :child_key => [:target_id], :key => true
         end
 
-        # Enhance the existing rating model
+        # Create or enhance the rating model
+        
         rating_model = begin ::Object.const_get(rating_model); rescue ::Object.const_set(rating_model, Class.new(::Object) ); end
         rating_model.class_eval do
           include ::DataMapper::Resource unless ancestors.include?(::DataMapper::Resource)
@@ -109,6 +110,8 @@ module DataMapper
           q = "INSERT INTO #{inf.tableize diff_model} (source_id, target_id) SELECT ?, id FROM #{inf.tableize self.class.name} WHERE id <> ?"
           repository.adapter.execute q, id, id
         end
+
+        # Cleanup after ourselves
 
         before :destroy do
           (diff_model.all(:target => self) | diff_model.all(:source => self)).destroy!
@@ -175,6 +178,7 @@ module DataMapper
 
         # Find resources based on user's previous ratings
         # @return DataMapper::Collection
+        # @api public
         def recommend(opts={})
           self.class.recommend_for_resource(self,opts)
         end
