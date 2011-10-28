@@ -18,17 +18,6 @@ require 'dm-slope_one'
 
 class MiniTest::Unit::TestCase
   include RR::Adapters::MiniTest
-end
-
-MiniTest::Unit.autorun
-
-class Object
-
-  def shout(*msgs)
-    wrap = "\n" + "="*80 + "\n"
-    msg  = wrap + "#{msgs.collect{|m| m.inspect}.join("\n")}" + wrap
-    $stdout.puts "[1;35m%s[0m" % msg
-  end
 
   def diff_test(values = nil,debug = false)
     values ||= {        
@@ -52,3 +41,5 @@ class Object
     recommendations.map(&:id) == values
   end
 end
+
+MiniTest::Unit.autorun
