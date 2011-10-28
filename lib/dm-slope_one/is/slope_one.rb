@@ -89,7 +89,7 @@ module DataMapper
 
         # Create or enhance the rating model
         
-        rating_model = begin ::Object.const_get(rating_model); rescue ::Object.const_set(rating_model, Class.new(::Object) ); end
+        rating_model = ::Object.const_get(rating_model) rescue ::Object.const_set(rating_model, Class.new(::Object) )
         rating_model.class_eval do
           include ::DataMapper::Resource unless ancestors.include?(::DataMapper::Resource)
           property rating_property, *rating_property_attributes
