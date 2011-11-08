@@ -101,6 +101,8 @@ module DataMapper
 
         # Setup relationships
 
+        has n, :source_diffs, diff_model.name, :child_key => [:source_id], :constraint => :destroy
+        has n, :target_diffs, diff_model.name, :child_key => [:target_id], :constraint => :destroy
         has n, inf.tableize(rating_model), :constraint => :destroy
         rater_model.has n, inf.tableize(rating_model), :constraint => :destroy
 
@@ -109,12 +111,6 @@ module DataMapper
         after :create do
           q = "INSERT INTO #{inf.tableize diff_model} (source_id, target_id) SELECT ?, id FROM #{inf.tableize self.class.name} WHERE id <> ?"
           repository.adapter.execute q, id, id
-        end
-
-        # Cleanup after ourselves
-
-        before :destroy do
-          (diff_model.all(:target => self) | diff_model.all(:source => self)).destroy!
         end
 
       end
