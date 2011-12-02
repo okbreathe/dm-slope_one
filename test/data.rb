@@ -7,7 +7,6 @@ end
 class Vote
   include DataMapper::Resource
   property :id, Serial 
-
 end
 
 class Article

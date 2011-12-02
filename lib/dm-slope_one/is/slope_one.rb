@@ -33,6 +33,9 @@ module DataMapper
       #   trigger diff updates. This is useful if you plan to batch process
       #   ratings offline.
       #   default:false
+      # @option options [String] :composite_key
+      #   If true then the rating model will use a composite key on subject and resource
+      #   default: true
       # @option options [String] :rating_type
       #   Can be Integer or Float
       #   default: Float
@@ -67,6 +70,7 @@ module DataMapper
           :diff_table       => inf.tableize(diff_model),
           :diff_model       => diff_model,
           :rating_property  => rating_property,
+          :composite_key    => true,
           :rating_type      => "Float",
           :rating_precision => 3,
           :rating_scale     => 2
@@ -93,8 +97,9 @@ module DataMapper
         rating_model.class_eval do
           include ::DataMapper::Resource unless ancestors.include?(::DataMapper::Resource)
           property rating_property, *rating_property_attributes
-          belongs_to inf.underscore(rater_model),    :key => true
-          belongs_to inf.underscore(resource_model), :key => true
+          opts = o[:composite_key] ? {:key => true} : {}
+          belongs_to inf.underscore(rater_model),    opts
+          belongs_to inf.underscore(resource_model), opts
           define_singleton_method :slope_one_options do resource_model.slope_one_options; end
           extend ::DataMapper::Is::SlopeOne::Rating
         end
