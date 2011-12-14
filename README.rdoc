@@ -5,7 +5,7 @@ Implementation of the {Slope One}[http://en.wikipedia.org/wiki/Slope_One] recomm
 === Note
 
 * Requires ruby 1.9.x
-* Requires a SQL based backend. It has only been tested on Postgres, but may work on other RDBMS.
+* Requires a SQL based backend. It has only been tested on Postgres, but may work on other RDBMS (although it doesn't currently work for SQLite3).
 
 === Reading
 

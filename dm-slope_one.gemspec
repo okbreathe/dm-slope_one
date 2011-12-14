@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Asher Van Brunt"]
-  s.date = "2011-10-20"
+  s.date = "2011-12-14"
   s.description = "Implementation of the [Slope One](http://en.wikipedia.org/wiki/Slope_One) recommendation algorithm for DataMapper"
   s.email = "asher.vanbrunt@gmail.com"
   s.extra_rdoc_files = [
@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/okbreathe/dm-slope_one"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.11"
+  s.rubygems_version = "1.8.10"
   s.summary = "Implementation of the [Slope One](http://en.wikipedia.org/wiki/Slope_One) recommendation algorithm for DataMapper"
 
   if s.respond_to? :specification_version then
