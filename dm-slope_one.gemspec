@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Asher Van Brunt"]
-  s.date = "2011-12-14"
+  s.date = "2012-01-23"
   s.description = "Implementation of the [Slope One](http://en.wikipedia.org/wiki/Slope_One) recommendation algorithm for DataMapper"
   s.email = "asher.vanbrunt@gmail.com"
   s.extra_rdoc_files = [
@@ -49,7 +49,6 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<minitest>, [">= 0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.4"])
-      s.add_development_dependency(%q<rcov>, [">= 0"])
       s.add_development_dependency(%q<rr>, [">= 0"])
       s.add_development_dependency(%q<dm-sqlite-adapter>, [">= 1.2.0"])
       s.add_development_dependency(%q<dm-postgres-adapter>, [">= 1.2.0"])
@@ -61,7 +60,6 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<minitest>, [">= 0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
-      s.add_dependency(%q<rcov>, [">= 0"])
       s.add_dependency(%q<rr>, [">= 0"])
       s.add_dependency(%q<dm-sqlite-adapter>, [">= 1.2.0"])
       s.add_dependency(%q<dm-postgres-adapter>, [">= 1.2.0"])
@@ -74,7 +72,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<minitest>, [">= 0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
-    s.add_dependency(%q<rcov>, [">= 0"])
     s.add_dependency(%q<rr>, [">= 0"])
     s.add_dependency(%q<dm-sqlite-adapter>, [">= 1.2.0"])
     s.add_dependency(%q<dm-postgres-adapter>, [">= 1.2.0"])
