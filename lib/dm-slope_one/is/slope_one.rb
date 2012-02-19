@@ -85,7 +85,7 @@ module DataMapper
         diff_model = ::Object.const_set(diff_model, Class.new(::Object) )
         diff_model.class_eval do
           include ::DataMapper::Resource unless ancestors.include?(::DataMapper::Resource)
-          property :count, Integer, :required => true, :min => 0, :default => 0
+          property :count, Integer, :required => true, :min => 0, :default => 0, :index => true
           property :sum, *rating_property_attributes
           belongs_to :source, resource_model.to_s, :child_key => [:source_id], :key => true
           belongs_to :target, resource_model.to_s, :child_key => [:target_id], :key => true
