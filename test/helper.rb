@@ -32,14 +32,25 @@ class MiniTest::Unit::TestCase
       diff = ArticleDiff.first(:source => Article.first(:name => a),:target => Article.first(:name => b))
 			assert_equal a, diff.source.name
 			assert_equal b, diff.target.name
-			assert_equal c, diff.count
-			assert_in_delta d, diff.sum
+      assert_in_delta d, diff.difference
+      assert_equal c, diff.frequency
     end
   end
   
   def recommendations_test(recommendations,values)
     recommendations.map(&:id) == values
   end
+end
+
+
+class Object
+
+  def shout(*msgs)
+    wrap = "\n" + "="*80 + "\n"
+    msg  = wrap + "#{msgs.collect{|m| m.inspect}.join("\n")}" + wrap
+    $stdout.puts "[1;35m%s[0m" % msg
+  end
+
 end
 
 MiniTest::Unit.autorun

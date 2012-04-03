@@ -4,6 +4,7 @@ require 'pathname'
 require 'dm-ar-finders'
 require 'dm-validations'
 require 'dm-constraints'
+require 'dm-transactions'
 
 # Require plugin-files
 

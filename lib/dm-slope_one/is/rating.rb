@@ -19,7 +19,7 @@ module DataMapper
               o = slope_one_options
               DataMapper::Inflector.constantize(o[:diff_model]).all.destroy!
               q = %Q{
-                INSERT INTO #{o[:diff_table]} ( source_id , target_id , sum , count )
+                INSERT INTO #{o[:diff_table]} ( source_id , target_id , difference , frequency )
                      SELECT r2.#{o[:resource_key]}
                           , r1.#{o[:resource_key]}
                           , SUM(r2.#{o[:rating_property]} - r1.#{o[:rating_property]})
@@ -36,22 +36,22 @@ module DataMapper
 
             def create_diffs
               r = self.class.slope_one_options[:rating_property]
-              update_diff_table("SET count = count + 1, sum = sum + r2.#{r} - r1.#{r}") 
+              update_diff_table("SET frequency = frequency + 1, difference = difference + r2.#{r} - r1.#{r}") 
             end
 
             def revert_diffs
               r = self.class.slope_one_options[:rating_property]
-              update_diff_table("SET sum = sum - (r2.#{r} - r1.#{r})") 
+              update_diff_table("SET difference = difference - (r2.#{r} - r1.#{r})") 
             end
 
             def update_diffs
               r = self.class.slope_one_options[:rating_property]
-              update_diff_table("SET sum = sum + r2.#{r} - r1.#{r}") 
+              update_diff_table("SET difference = difference + r2.#{r} - r1.#{r}") 
             end
 
             def remove_diffs
               r = self.class.slope_one_options[:rating_property]
-              update_diff_table("SET count = count - 1, sum = sum - (r2.#{r} - r1.#{r})" )
+              update_diff_table("SET frequency = frequency - 1, difference = difference - (r2.#{r} - r1.#{r})" )
             end
 
             protected
@@ -71,6 +71,7 @@ module DataMapper
               }
               repository.adapter.execute(query,send(o[:rater_key]), send(o[:resource_key]), send(o[:resource_key]))
             end
+
           end
         end # self.extended
 
@@ -78,3 +79,4 @@ module DataMapper
     end # SlopeOne
   end # Is
 end # DataMapper
+

@@ -80,27 +80,25 @@ module DataMapper
           [Float, :precision => o[:rating_precision], :scale => o[:rating_scale], :default => 0.0] : 
             [Integer, :default => 0]
 
-        # Create the diff model
+        # Create or enhance the diff model
 
-        diff_model = ::Object.const_set(diff_model, Class.new(::Object) )
+        diff_model = ::Object.const_get(diff_model) rescue ::DataMapper::Model.new(diff_model)
         diff_model.class_eval do
-          include ::DataMapper::Resource unless ancestors.include?(::DataMapper::Resource)
-          property :count, Integer, :required => true, :min => 0, :default => 0, :index => true
-          property :sum, *rating_property_attributes
+          property :frequency, Integer, :required => true, :min => 0, :default => 0, :index => true
+          property :difference, Float, :precision => o[:rating_precision], :scale => o[:rating_scale], :default => 0
           belongs_to :source, resource_model.to_s, :child_key => [:source_id], :key => true
           belongs_to :target, resource_model.to_s, :child_key => [:target_id], :key => true
         end
 
         # Create or enhance the rating model
         
-        rating_model = ::Object.const_get(rating_model) rescue ::Object.const_set(rating_model, Class.new(::Object) )
+        rating_model = ::Object.const_get(rating_model) rescue ::DataMapper::Model.new(rating_model)
+        opts         = o[:composite_key] ? {:key => true} : {}
         rating_model.class_eval do
-          include ::DataMapper::Resource unless ancestors.include?(::DataMapper::Resource)
           property rating_property, *rating_property_attributes
-          opts = o[:composite_key] ? {:key => true} : {}
           belongs_to inf.underscore(rater_model),    opts
           belongs_to inf.underscore(resource_model), opts
-          define_singleton_method :slope_one_options do resource_model.slope_one_options; end
+          define_singleton_method(:slope_one_options) { resource_model.slope_one_options } 
           extend ::DataMapper::Is::SlopeOne::Rating
         end
 
@@ -117,12 +115,14 @@ module DataMapper
           q = "INSERT INTO #{inf.tableize diff_model} (source_id, target_id) SELECT ?, id FROM #{inf.tableize self.class.name} WHERE id <> ?"
           repository.adapter.execute q, id, id
         end
+      end
 
+      def using_slope_one?
+        false
       end
 
       module ClassMethods
 
-        # @api public
         def using_slope_one?
           true
         end
@@ -137,11 +137,11 @@ module DataMapper
                  JOIN #{o[:rating_table]} r1 ON r1.#{o[:resource_key]} = f.target_id
             LEFT JOIN #{o[:rating_table]} r2 ON r2.#{o[:resource_key]} = f.source_id AND r2.#{o[:rater_key]} = r1.#{o[:rater_key]}
                 WHERE r1.#{o[:rater_key]} = ?
-                  AND f.count > 0 
+                  AND f.frequency > 0 
                   AND a.id = f.source_id
                #{"AND r2.#{o[:resource_key]} IS NULL" if opts[:exclusive]}
              GROUP BY f.source_id, a.id
-             ORDER BY ( SUM(f.sum + f.count * r1.#{o[:rating_property]}) / SUM(f.count) ) DESC LIMIT ?;
+             ORDER BY ( SUM(f.difference + f.frequency * r1.#{o[:rating_property]}) / SUM(f.frequency) ) DESC LIMIT ?;
           }
           find_by_sql [q, user.id, opts[:limit] || 20]
         end
@@ -152,10 +152,10 @@ module DataMapper
           q = %Q{
                SELECT a.*
                  FROM (#{frequency_matrix}) f, #{slope_one_options[:resource_table]} a
-                WHERE count > 0 
+                WHERE frequency > 0 
                   AND source_id = ? 
                   AND a.id = target_id
-             ORDER BY (sum / count) DESC LIMIT ?;
+             ORDER BY (difference / frequency) DESC LIMIT ?;
           }
           find_by_sql [q, resource.id, opts[:limit] || 20]
         end
@@ -165,10 +165,10 @@ module DataMapper
         def frequency_matrix
           @frequency_matrix ||=
           %Q{
-            SELECT source_id, target_id, count, sum 
+            SELECT source_id, target_id, frequency, difference 
               FROM #{slope_one_options[:diff_table]} 
-             UNION 
-            SELECT target_id, source_id, count, -sum 
+         UNION ALL
+            SELECT target_id, source_id, frequency, -difference 
               FROM #{slope_one_options[:diff_table]}
           }
         end
