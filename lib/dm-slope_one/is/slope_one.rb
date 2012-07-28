@@ -29,7 +29,8 @@ module DataMapper
       # @option options [Symbol] :rating_property
       #   The property that will be used when generating differentials
       #   default: score
-      # @option options [Boolean] - If true then inserting resources and ratings will not
+      # @option options [Boolean] :offline
+      #   If true then inserting resources and ratings will not
       #   trigger diff updates. This is useful if you plan to batch process
       #   ratings offline.
       #   default:false
