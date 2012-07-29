@@ -110,11 +110,12 @@ module DataMapper
         has n, inf.tableize(rating_model), :constraint => :destroy
         rater_model.has n, inf.tableize(rating_model), :constraint => :destroy
 
-        # Create empty diffs after we add a rateable item
-
-        after :create do
-          q = "INSERT INTO #{inf.tableize diff_model} (source_id, target_id) SELECT ?, id FROM #{inf.tableize self.class.name} WHERE id <> ?"
-          repository.adapter.execute q, id, id
+        unless o[:offline]
+          # Create empty diffs after we add a rateable item
+          after :create do
+            q = "INSERT INTO #{inf.tableize diff_model} (source_id, target_id) SELECT ?, id FROM #{inf.tableize self.class.name} WHERE id <> ?"
+            repository.adapter.execute q, id, id
+          end
         end
       end
 
